@@ -1,0 +1,161 @@
+# Switch Layout Tiling
+# Copyright (C) 2026 shimamu
+# https://github.com/shimamu/switch-layout-tiling
+# SPDX-License-Identifier: GPL-3.0-or-later
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-01 13:04+0900\n"
+"Language: ja\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: extension/logic/layoutPatterns.js:27
+msgid "full"
+msgstr "全画面"
+
+#: extension/logic/layoutPatterns.js:28
+msgid "vertical"
+msgstr "垂直"
+
+#: extension/logic/layoutPatterns.js:29
+msgid "horizontal"
+msgstr "水平"
+
+#: extension/logic/layoutPatterns.js:30
+msgid "vertical-horizontal-right"
+msgstr "右側を水平分割"
+
+#: extension/logic/layoutPatterns.js:31
+msgid "vertical-horizontal-left"
+msgstr "左側を水平分割"
+
+#: extension/logic/layoutPatterns.js:32
+msgid "vertical-vertical"
+msgstr "垂直に3分割"
+
+#: extension/logic/layoutPatterns.js:33
+msgid "horizontal-vertical-bottom"
+msgstr "下側を垂直分割"
+
+#: extension/logic/layoutPatterns.js:34
+msgid "horizontal-vertical-top"
+msgstr "上側を垂直分割"
+
+#: extension/logic/layoutPatterns.js:35
+msgid "horizontal-horizontal"
+msgstr "水平に3分割"
+
+#: extension/logic/layoutPatterns.js:36
+msgid "none"
+msgstr "なし"
+
+#: extension/ui/editor/layoutConfigurator.js:79
+#, javascript-format
+msgid "Layout for %s Split Areas"
+msgstr "%s分割領域のレイアウト"
+
+#: extension/ui/editor/layoutConfiguratorComponents.js:183
+#, javascript-format
+msgid "Split Line %s:"
+msgstr "分割線 %s:"
+
+#: extension/ui/editor/layoutMapEditor.js:46
+msgid "Save"
+msgstr "保存"
+
+#: extension/ui/editor/layoutMapEditor.js:52 extension/ui/indicatorMenu.js:230
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: extension/ui/editor/layoutMapEditor.js:179
+#, javascript-format
+msgid "Edit Layout %s"
+msgstr "レイアウト%sを編集"
+
+#: extension/ui/indicatorMenu.js:120
+#, javascript-format
+msgid "%s. "
+msgstr "%s. "
+
+#: extension/ui/indicatorMenu.js:211
+#, javascript-format
+msgid "Do you want to delete layout %s?"
+msgstr "レイアウト%sを削除しますか？"
+
+#: extension/ui/indicatorMenu.js:222
+msgid "Delete"
+msgstr "削除"
+
+#: extension/ui/indicatorMenu.js:366
+#, javascript-format
+msgid "Area %s"
+msgstr "領域%s"
+
+#: extension/ui/indicatorMenu.js:400
+msgid "Fixed Areas (on Rotation)"
+msgstr "回転時の固定領域"
+
+#: extension/ui/indicatorMenu.js:409
+msgid "Clear All"
+msgstr "すべて解除"
+
+#: extension/ui/indicatorMenu.js:412
+msgid "Clear all fixed areas"
+msgstr "すべての固定領域を解除します"
+
+#: extension/ui/indicatorMenu.js:500
+msgid "Layouts"
+msgstr "レイアウト"
+
+#: extension/ui/indicatorMenu.js:624
+msgid "Retile Windows"
+msgstr "ウィンドウを再配置"
+
+#: extension/ui/indicatorMenu.js:636
+msgid "Add Layout"
+msgstr "レイアウトを追加"
+
+#: extension/ui/indicatorMenu.js:651
+msgid "Settings"
+msgstr "設定"
+
+#: extension/extension.js:113
+#, javascript-format
+msgid "You can only add up to %s layouts"
+msgstr "レイアウトは最大%s個まで追加できます"
+
+#: extension/prefs.js:30
+msgid "General"
+msgstr "全般"
+
+#: extension/prefs.js:37
+msgid "Appearance"
+msgstr "外観"
+
+#: extension/prefs.js:38
+msgid "Configure the appearance of the extension"
+msgstr "拡張機能の外観を設定します"
+
+#: extension/prefs.js:42
+msgid "Tile Gap (px)"
+msgstr "ウィンドウ間隔 (px)"
+
+#: extension/prefs.js:43
+msgid "Gap between tiled windows"
+msgstr "タイル配置したウィンドウ間の間隔"
+
+#: extension/prefs.js:65
+msgid "Developer Options"
+msgstr "開発者向けオプション"
+
+#: extension/prefs.js:66
+msgid "Advanced and debugging settings"
+msgstr "詳細設定とデバッグ設定"
+
+#: extension/prefs.js:75
+msgid "Log Level"
+msgstr "ログレベル"
+
+#: extension/prefs.js:76
+msgid "Control how verbose the logging is"
+msgstr "ログの出力レベルを設定します"

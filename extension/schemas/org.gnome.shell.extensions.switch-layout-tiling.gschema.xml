@@ -1,0 +1,40 @@
+<!--
+ * Switch Layout Tiling
+ *
+ * Copyright (C) 2026  shimamu
+ *
+ * https://github.com/shimamu/switch-layout-tiling
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<schemalist>
+  <schema id="org.gnome.shell.extensions.switch-layout-tiling" path="/org/gnome/shell/extensions/switch-layout-tiling/">
+    <key name="layout-maps" type="s">
+      <default>"[]"</default>
+      <summary>List of tiling layoutMaps</summary>
+      <description>
+        JSON-encoded array of layoutMaps objects.
+      </description>
+    </key>
+    <key name="log-level" type="i">
+      <default>1</default> <!-- INFO -->
+      <summary>Logging level</summary>
+      <description>
+        Set the logging level (0=DEBUG, 1=INFO, 2=WARN, 3=ERROR).
+      </description>
+    </key>
+    <key name="tile-margin" type="i">
+      <default>4</default>
+      <summary>Tile margin in pixels</summary>
+      <description>Margin between tiled windows in pixels.</description>
+    </key>
+    <key name="workspace-layout-map-index-map" type="s">
+      <default>"{}"</default>
+      <summary>Map of workspace indexes to layout map indexes</summary>
+      <description>
+        JSON-encoded object of workspace indexes to layout map indexes.
+      </description>
+    </key>
+  </schema>
+</schemalist>
+

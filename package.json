@@ -1,0 +1,32 @@
+{
+  "name": "switch-layout-tiling",
+  "version": "1.0.0",
+  "main": "extension/extension.js",
+  "scripts": {
+    "test": "vitest",
+    "test:watch": "vitest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shimamu/switch-layout-tiling.git"
+  },
+  "author": "shimamu",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/shimamu/switch-layout-tiling/issues"
+  },
+  "homepage": "https://github.com/shimamu/switch-layout-tiling#readme",
+  "description": "",
+  "devDependencies": {
+    "@eslint/css": "^0.10.0",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^0.13.0",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint": "^10.14.0",
+    "globals": "^16.3.0",
+    "vitest": "^4.1.12"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1"
+  }
+}
