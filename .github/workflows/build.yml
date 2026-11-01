@@ -31,7 +31,7 @@ jobs:
           zip -r ../switch-layout-tiling@shimamu.github.com.zip .
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: switch-layout-tiling@shimamu.github.com
           path: switch-layout-tiling@shimamu.github.com.zip
