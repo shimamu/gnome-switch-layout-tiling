@@ -13,7 +13,6 @@ A GNOME Shell extension that automatically tiles windows using predefined layout
   - Full
   - Vertical
   - Horizontal
-  - Half
   - Half then Half
   - Three Equal
 - Supports multiple layout maps with customizable split areas
