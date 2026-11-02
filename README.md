@@ -26,7 +26,49 @@ A GNOME Shell extension that automatically tiles windows using predefined layout
 
 ## Screenshots
 
-<!-- Add screenshots here -->
+### Indicator Menu
+
+The indicator menu allows you to switch between layout maps
+and configure fixed split areas.
+
+![Indicator Menu](assets/screenshots/indicator-menu.png)
+
+### Layout Map Editor
+
+The Layout Map Editor allows you to configure split areas
+for each layout map.
+
+![Layout Map Editor](assets/screenshots/layout-map-editor.png)
+
+### Split Areas
+
+The extension supports layouts with different numbers of split areas.
+
+| One Split Area | Two Split Areas | Three Split Areas |
+| --- | --- | --- |
+| ![One Split Area](assets/screenshots/split-area-1.png) | ![Two Split Areas](assets/screenshots/split-area-2.png) | ![Three Split Areas](assets/screenshots/split-area-3.png) |
+
+### Switching Layouts
+
+Scroll down to switch to the next layout in clockwise order.
+
+The following screenshots show how the window arrangement changes
+when switching layouts.
+
+| Initial Layout | Scrolled | Scrolled with Area 1 Fixed |
+| --- | --- | --- |
+| ![Initial Layout](assets/screenshots/split-area-3.png) | ![Scrolled](assets/screenshots/split-area-3-scrolled.png) | ![Scrolled with Area 1 Fixed](assets/screenshots/split-area-3-fixed-area-1-scrolled.png) |
+
+You can fix individual split areas to keep their positions
+when switching layouts.
+
+### Fixed Split Areas
+
+You can select a split area from the indicator menu to fix its position
+when switching layouts.
+
+![Fixed Split Area](assets/screenshots/fixed-area-1.png)
+
 
 ## Installation
 
