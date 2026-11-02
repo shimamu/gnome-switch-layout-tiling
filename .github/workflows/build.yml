@@ -26,13 +26,12 @@ jobs:
 
       - name: Create extension archive
         run: |
-          cp LICENSE extension/
-          cd extension
-          zip -r ../switch-layout-tiling@shimamu.github.com.zip .
+          cp LICENSE extension
+          zip -r -v switch-layout-tiling@shimamu.github.com.zip extension
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: switch-layout-tiling@shimamu.github.com
-          path: switch-layout-tiling@shimamu.github.com.zip
+          path: extension
           if-no-files-found: error
