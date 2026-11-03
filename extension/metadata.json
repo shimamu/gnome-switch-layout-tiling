@@ -6,6 +6,6 @@
   "shell-version": ["48", "49", "50"],
   "gettext-domain": "switch-layout-tiling",
   "settings-schema": "org.gnome.shell.extensions.switch-layout-tiling",
-  "url": "https://github.com/shimamu/switch-layout-tiling"
+  "url": "https://github.com/shimamu/gnome-switch-layout-tiling"
 }
 
