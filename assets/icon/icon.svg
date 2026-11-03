@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1024"
+   height="1024"
+   viewBox="0 0 1024 1024"
+   version="1.1"
+   id="svg986"
+   sodipodi:docname="icon.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:export-filename="/home/shimamu/share/icon/icon.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:label="icon"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview988"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.32153204"
+     inkscape:cx="115.07407"
+     inkscape:cy="253.47396"
+     inkscape:window-width="1866"
+     inkscape:window-height="1016"
+     inkscape:window-x="54"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg986" />
+  <defs
+     id="defs942">
+    <linearGradient
+       id="bg"
+       x1="0"
+       y1="0"
+       x2="1"
+       y2="1"
+       gradientUnits="objectBoundingBox"
+       spreadMethod="pad">
+      <stop
+         offset="0"
+         stop-color="#3988f4"
+         id="stop915" />
+      <stop
+         offset="1"
+         stop-color="#0752c7"
+         id="stop917" />
+    </linearGradient>
+    <linearGradient
+       id="bar"
+       x1="0"
+       y1="0"
+       x2="0"
+       y2="1">
+      <stop
+         offset="0"
+         stop-color="#668fc5"
+         id="stop920" />
+      <stop
+         offset="1"
+         stop-color="#4775ae"
+         id="stop922" />
+    </linearGradient>
+    <filter
+       id="shadow"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feDropShadow
+         dx="0"
+         dy="12"
+         stdDeviation="12"
+         flood-color="#003b91"
+         flood-opacity=".32" />
+    </filter>
+    <g
+       id="dots"
+       fill="#eaf2ff">
+      <circle
+         cx="0"
+         cy="0"
+         r="12"
+         id="circle926" />
+      <circle
+         cx="40"
+         cy="0"
+         r="12"
+         id="circle928" />
+      <circle
+         cx="80"
+         cy="0"
+         r="12"
+         id="circle930" />
+    </g>
+    <g
+       id="window-frame"
+       filter="url(#shadow)">
+      <rect
+         width="330"
+         height="270"
+         rx="28"
+         fill="#fff"
+         id="rect933" />
+      <rect
+         x="22"
+         y="22"
+         width="286"
+         height="226"
+         rx="16"
+         fill="#f9fbff"
+         stroke="#dce5f4"
+         stroke-width="2"
+         id="rect935" />
+      <path
+         d="M22 38a16 16 0 0 1 16-16h254a16 16 0 0 1 16 16v38H22z"
+         fill="url(#bar)"
+         id="path937" />
+      <use
+         href="#dots"
+         x="56"
+         y="50"
+         id="use939" />
+    </g>
+  </defs>
+  <rect
+     style="display:inline;fill:#226baa;fill-opacity:1;stroke:#ffffff;stroke-width:1.00157;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+     id="rect1284"
+     width="1024"
+     height="1024"
+     x="0"
+     y="0"
+     rx="80"
+     ry="80"
+     inkscape:label="icon-area" />
+  <rect
+     style="display:inline;fill:#226baa;fill-opacity:1;stroke:#ffffff;stroke-width:77.6373;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+     id="rect1486-5"
+     width="724.1767"
+     height="631.05713"
+     x="75.722816"
+     y="114.39876"
+     rx="35.724319"
+     ry="32.651394"
+     inkscape:label="layout2" />
+  <rect
+     style="display:inline;fill:#226baa;fill-opacity:1;stroke:none;stroke-width:84.4385;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+     id="rect1486-6"
+     width="805.03961"
+     height="671.48859"
+     x="146.85957"
+     y="211.8598"
+     rx="39.71336"
+     ry="34.743343"
+     inkscape:label="boundary"
+     inkscape:export-filename="/home/shimamu/share/icon/rect1486-6.png"
+     inkscape:export-xdpi="96"
+     inkscape:export-ydpi="96" />
+  <!-- Single-pane layout -->
+  <!-- Vertical split layout -->
+  <!-- Horizontal split layout -->
+  <!-- Cycle arrows -->
+  <rect
+     style="display:inline;fill:#226baa;fill-opacity:1;stroke:#ffffff;stroke-width:77.6373;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+     id="rect1486"
+     width="724.17676"
+     height="631.05713"
+     x="214.84183"
+     y="282.50873"
+     rx="35.724319"
+     ry="32.65139"
+     inkscape:label="layout1" />
+  <rect
+     style="display:inline;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:23.146;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+     id="rect1892"
+     width="56.853966"
+     height="597.42987"
+     x="666.97095"
+     y="298.19864"
+     inkscape:label="split-line1" />
+  <rect
+     style="display:inline;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:14.9954;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+     id="rect1892-7"
+     width="65.004578"
+     height="219.31361"
+     x="593.05988"
+     y="-933.18591"
+     transform="rotate(90)"
+     inkscape:label="split-line2" />
+</svg>
