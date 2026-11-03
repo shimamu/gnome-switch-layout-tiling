@@ -52,18 +52,23 @@ class LayoutMapListRow {
   destroy() {
     logger.debug(`${this.constructor.name} destroyed`);
 
+    this._layoutMenuItem?.disconnect(this._layoutMenuItemSignalId);
     this._layoutMenuItem?.destroy();
     this._layoutMenuItem = null;
 
+    this._upButton?.disconnect(this._upButtonSignalId);
     this._upButton?.destroy();
     this._upButton = null;
 
+    this._downButton?.disconnect(this._downButtonSignalId);
     this._downButton?.destroy();
     this._downButton = null;
 
+    this._editButton?.disconnect(this._editButtonSignalId);
     this._editButton?.destroy();
     this._editButton = null;
 
+    this._deleteButton?.disconnect(this._deleteButtonSignalId);
     this._deleteButton?.destroy();
     this._deleteButton = null;
 
@@ -104,7 +109,7 @@ class LayoutMapListRow {
       style_class: 'popup-menu-item layout-map-list-row-container',
     });
 
-    menuItem.connect('button-press-event', () => {
+    this._layoutMenuItemSignalId = menuItem.connect('button-press-event', () => {
       onActivate(this._layoutMapIndex);
     });
 
@@ -154,7 +159,7 @@ class LayoutMapListRow {
     });
 
     button.set_child(IconFactory.createIconFromTheme(IconName.UP));
-    button.connect('clicked', () => {
+    this._upButtonSignalId = button.connect('clicked', () => {
       onMoveUp(this._layoutMapIndex);
     });
 
@@ -168,7 +173,7 @@ class LayoutMapListRow {
     });
 
     button.set_child(IconFactory.createIconFromTheme(IconName.DOWN));
-    button.connect('clicked', () => {
+    this._downButtonSignalId = button.connect('clicked', () => {
       onMoveDown(this._layoutMapIndex);
     });
 
@@ -182,7 +187,7 @@ class LayoutMapListRow {
     });
 
     button.set_child(IconFactory.createIconFromTheme(IconName.EDIT));
-    button.connect('clicked', () => {
+    this._editButtonSignalId = button.connect('clicked', () => {
       onEdit(this._layoutMapIndex);
     });
 
@@ -196,7 +201,7 @@ class LayoutMapListRow {
     });
 
     button.set_child(IconFactory.createIconFromTheme(IconName.DELETE));
-    button.connect('clicked', () => {
+    this._deleteButtonSignalId = button.connect('clicked', () => {
       const confirmDialog = this._createDeleteDialog(onDelete, onDeleteCancel);
       confirmDialog.open();
     });
@@ -325,6 +330,7 @@ class FixedAreaSection {
 
     this._container = new PopupMenu.PopupMenuSection();
     this._menuItems = [];
+    this._menuItemSignalIds = [];
 
     this._createComponents();
     this._buildUI();
@@ -350,9 +356,14 @@ class FixedAreaSection {
   destroy() {
     logger.debug(`${this.constructor.name} destroyed`);
 
-    this._menuItems.forEach(menuItem => menuItem.destroy());
+    this._menuItems.forEach((menuItem, index) => {
+      menuItem.disconnect(this._menuItemSignalIds[index]);
+      menuItem.destroy();
+    });
     this._menuItems = [];
+    this._menuItemSignalIds = [];
 
+    this._clearButton.disconnect(this._clearButtonSignalId);
     this._clearButton?.destroy();
     this._clearButton = null;
 
@@ -375,10 +386,12 @@ class FixedAreaSection {
         )
       );
 
-      menuItem.connect('activate', () => {
+      const signalId = menuItem.connect('activate', () => {
         this._handlers.onToggleFixedArea(areaIndex);
         this.refresh();
       });
+
+      this._menuItemSignalIds.push(signalId);
 
       return menuItem;
     });
@@ -417,7 +430,7 @@ class FixedAreaSection {
 
     this._clearButton.set_accessible_name(_('Clear all fixed areas'));
 
-    this._clearButton.connect('clicked', () => {
+    this._clearButtonSignalId = this._clearButton.connect('clicked', () => {
       this._handlers.onClearFixedAreas();
       this.refresh();
     });
@@ -550,6 +563,7 @@ export class IndicatorMenu {
   destroy() {
     logger.debug(`${this.constructor.name} destroyed`);
 
+    this._menuItemRetileWindows?.disconnect(this._menuItemRetileWindowsSignalId);
     this._menuItemRetileWindows?.destroy();
     this._menuItemRetileWindows = null;
 
@@ -559,9 +573,11 @@ export class IndicatorMenu {
     this._layoutMapSection?.destroy();
     this._layoutMapSection = null;
 
+    this._menuItemAddLayout?.disconnect(this._menuItemAddLayoutSignalId);
     this._menuItemAddLayout?.destroy();
     this._menuItemAddLayout = null;
 
+    this._menuItemSettings?.disconnect(this._menuItemSettingsSignalId);
     this._menuItemSettings?.destroy();
     this._menuItemSettings = null;
 
@@ -639,7 +655,7 @@ export class IndicatorMenu {
       icon: IconFactory.createIconFromTheme(IconName.REFRESH),
       labelText: _('Retile Windows'),
     });
-    menuItemRetileWindows.connect('activate', () => {
+    this._menuItemRetileWindowsSignalId = menuItemRetileWindows.connect('activate', () => {
       onRetileWindows();
     });
 
@@ -652,7 +668,7 @@ export class IndicatorMenu {
       labelText: _('Add Layout'),
     });
 
-    menuItemAddLayout.connect('activate', () => {
+    this._menuItemAddLayoutSignalId = menuItemAddLayout.connect('activate', () => {
       if (onAddNewLayoutMap()) {
         this.refresh();
       }
@@ -666,7 +682,7 @@ export class IndicatorMenu {
       icon: IconFactory.createIconFromTheme(IconName.SETTINGS),
       labelText: _('Settings'),
     });
-    menuItemSettings.connect('activate', () => {
+    this._menuItemSettingsSignalId = menuItemSettings.connect('activate', () => {
       onOpenSettingsWindow();
     });
 

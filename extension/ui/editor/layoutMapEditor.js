@@ -37,6 +37,11 @@ class ActionButtonsPane {
     this._build();
   }
 
+  disconnectSignals() {
+    this._saveButton.disconnect(this._saveButtonSignalId);
+    this._cancelButton.disconnect(this._cancelButtonSignalId);
+  }
+
   destroy() {
     logger.debug(`${this.constructor.name} destroyed`);
     // Child actors are destroyed with the parent actor.
@@ -55,13 +60,13 @@ class ActionButtonsPane {
       label: _('Save'),
       style_class: 'button',
     });
-    this._saveButton.connect('clicked', this._handlers.onSave);
+    this._saveButtonSignalId = this._saveButton.connect('clicked', this._handlers.onSave);
 
     this._cancelButton = new St.Button({
       label: _('Cancel'),
       style_class: 'button',
     });
-    this._cancelButton.connect('clicked', this._handlers.onCancel);
+    this._cancelButtonSignalId = this._cancelButton.connect('clicked', this._handlers.onCancel);
   }
 
   _build() {
@@ -233,6 +238,8 @@ export class LayoutMapEditor {
       return;
 
     this._closing = true;
+
+    this._actionButtonsPane.disconnectSignals();
 
     this._dialog.close();
 
