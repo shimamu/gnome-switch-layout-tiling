@@ -21,12 +21,17 @@ jobs:
 
       - name: Build extension
         run: |
-          make compile-schemas
           make compile-locales
 
       - name: Create extension archive
         run: |
           cp LICENSE extension
+
+          # Remove unnecessary build and translation artifacts
+          rm -f extension/locale/*.pot
+          rm -f extension/locale/*/LC_MESSAGES/*.po
+          rm -f extension/schemas/gschemas.compiled
+
           zip -r -v switch-layout-tiling@shimamu.github.com.zip extension
 
       - name: Upload artifact
