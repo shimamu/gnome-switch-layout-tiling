@@ -121,17 +121,8 @@ export class WindowPlacer {
   }
 
   _unmaximizeWindow(targetWindow) {
-    if (typeof targetWindow.get_maximized === 'function') {
-      // GNOME Shell 49 and earlier
-      const maxState = targetWindow.get_maximized();
-
-      if (maxState)
-        targetWindow.unmaximize(maxState);
-    } else {
-      // GNOME Shell 50 and later
-      if (targetWindow.maximized_horizontally || targetWindow.maximized_vertically)
-        targetWindow.unmaximize();
-    }
+    if (targetWindow.maximized_horizontally || targetWindow.maximized_vertically)
+      targetWindow.unmaximize();
   }
 
   _logLayout(targetWindow, index, rectRatio, rectPixel) {
