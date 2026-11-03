@@ -9,6 +9,7 @@
  */
 import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 import St from 'gi://St';
+import { logger } from '../../io/logger.js';
 import { pipe } from '../../logic/functional.js';
 import { patternOf, splitRatioOf } from '../../logic/layoutOperations.js';
 import { patternsForSplitAreaCount, LayoutConverter } from '../../logic/layoutPatterns.js';
@@ -36,6 +37,16 @@ export class LayoutConfigurator {
 
   applySelectableMode(mode) {
     this._patternSelector.applySelectableMode(mode);
+  }
+
+  destroy() {
+    logger.debug(`${this.constructor.name} destroyed`);
+    // Child actors are destroyed with the parent actor.
+
+    this._container = null;
+    this._previewPane = null;
+    this._patternSelector = null;
+    this._splitSlider = null;
   }
 
   get actor() {

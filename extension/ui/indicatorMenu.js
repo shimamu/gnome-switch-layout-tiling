@@ -276,6 +276,9 @@ class LayoutMapListView {
     });
     this._layoutMapListRows = null;
 
+    this._layoutMapListContainer?.destroy();
+    this._layoutMapListContainer = null;
+
     this._container?.destroy();
     this._container = null;
   }
@@ -349,6 +352,9 @@ class FixedAreaSection {
 
     this._menuItems.forEach(menuItem => menuItem.destroy());
     this._menuItems = [];
+
+    this._clearButton?.destroy();
+    this._clearButton = null;
 
     this._container?.destroy();
     this._container = null;
@@ -446,7 +452,7 @@ class LayoutMapSection {
 
   refresh() {
     // GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-    this.destroy();
+    this._destroyItems();
     this._createComponents();
     this._buildUI();
     this.updateActiveLayoutMapCheck();
@@ -465,7 +471,10 @@ class LayoutMapSection {
     this._layoutMapListView?.destroy();
     this._layoutMapListView = null;
 
-    this._container.actor.remove_all_children();
+    this._destroyItems();
+
+    this._container?.destroy();
+    this._container = null;
   }
 
   get actor() {
@@ -502,6 +511,13 @@ class LayoutMapSection {
     }));
 
     return title;
+  }
+
+  _destroyItems() {
+    this._layoutMapListView?.destroy();
+    this._layoutMapListView = null;
+
+    this._container.actor.remove_all_children();
   }
 }
 

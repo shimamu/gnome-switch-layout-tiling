@@ -37,6 +37,15 @@ class ActionButtonsPane {
     this._build();
   }
 
+  destroy() {
+    logger.debug(`${this.constructor.name} destroyed`);
+    // Child actors are destroyed with the parent actor.
+
+    this._container = null;
+    this._saveButton = null;
+    this._cancelButton = null;
+  }
+
   get actor() {
     return this._container;
   }
@@ -164,6 +173,20 @@ export class LayoutMapEditor {
     this._dialog.open();
   }
 
+  destroy() {
+    logger.debug(`${this.constructor.name} destroyed`);
+
+    this._actionButtonsPane.destroy();
+    this._layoutConfigurators.forEach(configurator => {
+      configurator.destroy();
+    });
+
+    this._dialog = null;
+    this._container = null;
+    this._actionButtonsPane = null;
+    this._layoutConfigurators = null;
+  }
+
   _createComponents() {
     this._createLayoutConfigurators();
     this._createActionButtonsPane(this._handlers.onSave);
@@ -212,6 +235,8 @@ export class LayoutMapEditor {
     this._closing = true;
 
     this._dialog.close();
+
+    this.destroy();
 
     this._handlers.onClose?.();
   }
