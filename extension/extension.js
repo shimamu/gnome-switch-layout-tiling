@@ -13,7 +13,7 @@ import Clutter from 'gi://Clutter';
 import { Indicator } from './ui/indicator.js';
 import { LayoutMapEditor } from './ui/editor/layoutMapEditor.js';
 import { DeveloperPreferences, LayoutPreferences } from './io/settings.js';
-import { logger } from './io/logger.js';
+import { Logger } from './io/logger.js';
 import { WindowPlacer } from './io/windowPlacer.js';
 import { pipe } from './logic/functional.js';
 import { LayoutMapsManager } from './logic/layoutMapsManager.js';
@@ -38,8 +38,9 @@ export default class SwitchLayoutTilingExtension extends Extension {
 
   enable() {
     this._extensionId = this.uuid.split('@')[0];
-    logger.setExtensionId(this._extensionId);
-    logger.info('Enabling extension');
+    this._logger = new Logger();
+    this._logger.setExtensionId(this._extensionId);
+    this._logger.info('Enabling extension');
 
     this._createComponents();
     this._connectSignals();
@@ -69,11 +70,11 @@ export default class SwitchLayoutTilingExtension extends Extension {
 
     switch (direction) {
     case Clutter.ScrollDirection.DOWN:
-      logger.info('Rotate layout map clockwise');
+      this._logger.info('Rotate layout map clockwise');
       this._tilingCoordinator.rotateWindowsClockwise(fixedAreaIndexes);
       break;
     case Clutter.ScrollDirection.UP:
-      logger.info('Rotate layout map counterclockwise');
+      this._logger.info('Rotate layout map counterclockwise');
       this._tilingCoordinator.rotateWindowsCounterClockwise(fixedAreaIndexes);
       break;
     }
@@ -94,6 +95,7 @@ export default class SwitchLayoutTilingExtension extends Extension {
           this._indicator.openPanelMenuLater();
         },
       },
+      logger: this._logger,
     });
 
     editor.open();
@@ -113,7 +115,7 @@ export default class SwitchLayoutTilingExtension extends Extension {
   addNewLayoutMap() {
     const layoutMap = this._layoutMapsManager.addNewLayoutMap();
     if (!layoutMap) {
-      logger.warn(`Cannot add more than ${LayoutMapsManager.MAX_LAYOUT_COUNT} layouts`);
+      this._logger.warn(`Cannot add more than ${LayoutMapsManager.MAX_LAYOUT_COUNT} layouts`);
       Main.notify(
         this.metadata.name,
         _('You can only add up to %s layouts').replace(
@@ -134,21 +136,22 @@ export default class SwitchLayoutTilingExtension extends Extension {
     this._developerPreferences = new DeveloperPreferences(settings);
     this._layoutPreferences = new LayoutPreferences(settings);
 
-    logger.setLevel(this._developerPreferences.getLogLevel());
+    this._logger.setLevel(this._developerPreferences.getLogLevel());
 
     this._workspaceLayoutMapSelection = new WorkspaceLayoutMapSelection(settings);
     this._workspaceLayoutMapSelection.load();
     this._workspaceFixedAreaIndexMap = new WorkspaceFixedAreaSelection();
 
-    this._layoutMapsManager = new LayoutMapsManager(settings);
+    this._layoutMapsManager = new LayoutMapsManager(settings, this._logger);
     this._layoutMapsManager.load();
 
-    this._windowPlacer =  new WindowPlacer(this._layoutPreferences);
+    this._windowPlacer =  new WindowPlacer(this._layoutPreferences, this._logger);
     this._tilingCoordinator = new TilingCoordinator({
       dataSource: {
         getActiveLayoutMap: () => this._getActiveLayoutMap(),
       },
       windowPlacer: this._windowPlacer,
+      logger: this._logger,
     });
 
     this._indicator = new Indicator({
@@ -202,6 +205,7 @@ export default class SwitchLayoutTilingExtension extends Extension {
           this.rotateWindowsOnScroll(direction);
         },
       },
+      logger: this._logger,
     });
   }
 
@@ -244,8 +248,8 @@ export default class SwitchLayoutTilingExtension extends Extension {
 
   _updateLoggerOnLogLevelChanged() {
     this._logLevelChangedId = this._developerPreferences.onLogLevelChanged(() => {
-      logger.setLevel(this._developerPreferences.getLogLevel());
-      logger.info('Log level changed to', logger.levelName());
+      this._logger.setLevel(this._developerPreferences.getLogLevel());
+      this._logger.info('Log level changed to', this._logger.levelName());
     });
   }
 

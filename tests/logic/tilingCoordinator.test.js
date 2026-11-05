@@ -14,13 +14,11 @@ const mocks = vi.hoisted(() => ({
   splitAreaCount: 2,
   layoutMap: { 1: {}, 2: {} },
   currentTime: 1000,
-  applyLayoutMap: vi.fn(),
   getActiveLayoutMap: vi.fn(),
   getSplitAreaCount: vi.fn(),
+  applyLayoutMap: vi.fn(),
   loggerInfo: vi.fn(),
   loggerDebug: vi.fn(),
-  loggerWarn: vi.fn(),
-  loggerError: vi.fn(),
 }));
 
 vi.mock('gi://GLib', () => ({
@@ -37,31 +35,35 @@ vi.mock('../../extension/env/desktopContext.js', () => ({
   },
 }));
 
-vi.mock('../../extension/io/logger.js', () => ({
-  logger: {
-    info: mocks.loggerInfo,
-    debug: mocks.loggerDebug,
-    warn: mocks.loggerWarn,
-    error: mocks.loggerError,
-  },
-}));
-
 vi.mock('../../extension/io/windowOrder.js', () => ({
-  WindowOrder: {
-    CLOCKWISE: 1,
-    COUNTER_CLOCKWISE: -1,
+  WindowOrder: class {
+    static CLOCKWISE = 1;
+    static COUNTER_CLOCKWISE = -1;
+
+    constructor() {
+      this.CLOCKWISE = 1;
+      this.COUNTER_CLOCKWISE = -1;
+    }
+
+    getActiveWindowsNewestFirst() {
+      return mocks.activeWindows;
+    }
+
+    reorderActiveWindows(activeWindows, visibleWindows) {
+      return [
+        ...visibleWindows,
+        ...activeWindows.filter(
+          targetWindow => !visibleWindows.includes(targetWindow),
+        ),
+      ];
+    }
+
+    rotateWindowOrder(windows) {
+      return windows;
+    }
+
+    logWindowOrder() {}
   },
-
-  getActiveWindowsNewestFirst: () => mocks.activeWindows,
-
-  logWindowOrder: vi.fn(),
-
-  reorderActiveWindows: (activeWindows, visibleWindows) => [
-    ...visibleWindows,
-    ...activeWindows.filter(
-      (targetWindow) => !visibleWindows.includes(targetWindow),
-    ),
-  ],
 }));
 
 import { TilingCoordinator } from '../../extension/logic/tilingCoordinator.js';
@@ -74,7 +76,7 @@ function createWindow(id) {
       mocks.activeWindows = [
         this,
         ...mocks.activeWindows.filter(
-          (targetWindow) => targetWindow !== this,
+          targetWindow => targetWindow !== this,
         ),
       ];
 
@@ -84,6 +86,13 @@ function createWindow(id) {
     get_user_time() {
       return this.lastActivationTimestamp ?? 0;
     },
+  };
+}
+
+function createLogger() {
+  return {
+    info: mocks.loggerInfo,
+    debug: mocks.loggerDebug,
   };
 }
 
@@ -98,14 +107,7 @@ function createCoordinator({
 
   const windowPlacer = {
     getSplitAreaCount: mocks.getSplitAreaCount,
-
-    applyLayoutMap: vi.fn((map) => {
-      windowPlacer.windowsAtLayoutApplication = [
-        ...mocks.activeWindows,
-      ];
-
-      mocks.applyLayoutMap(map);
-    }),
+    applyLayoutMap: mocks.applyLayoutMap,
   };
 
   const coordinator = new TilingCoordinator({
@@ -113,6 +115,7 @@ function createCoordinator({
       getActiveLayoutMap: mocks.getActiveLayoutMap,
     },
     windowPlacer,
+    logger: createLogger(),
   });
 
   return { coordinator, windowPlacer };
@@ -124,14 +127,12 @@ beforeEach(() => {
   mocks.layoutMap = { 1: {}, 2: {} };
   mocks.currentTime = 1000;
 
-  mocks.applyLayoutMap.mockReset();
   mocks.getActiveLayoutMap.mockReset();
   mocks.getSplitAreaCount.mockReset();
+  mocks.applyLayoutMap.mockReset();
 
   mocks.loggerInfo.mockReset();
   mocks.loggerDebug.mockReset();
-  mocks.loggerWarn.mockReset();
-  mocks.loggerError.mockReset();
 
   global.get_current_time = vi.fn(() => ++mocks.currentTime);
 });
@@ -145,7 +146,7 @@ describe('tileWindows', () => {
     ];
     const layoutMap = { 1: {}, 2: {} };
 
-    const { coordinator, windowPlacer } = createCoordinator({
+    const { coordinator } = createCoordinator({
       windows,
       layoutMap,
       splitAreaCount: 2,
@@ -161,21 +162,17 @@ describe('tileWindows', () => {
 
     coordinator.tileWindows();
 
-    expect(
-      windowPlacer.windowsAtLayoutApplication.map(
-        (targetWindow) => targetWindow.id,
-      ),
-    ).toEqual([1, 2, 3]);
-
-    expect(windowPlacer.applyLayoutMap).toHaveBeenLastCalledWith(layoutMap);
+    expect(mocks.applyLayoutMap).toHaveBeenLastCalledWith(
+      windows,
+      layoutMap,
+    );
   });
 
   it('applies the layout when there are no windows', () => {
-    const { coordinator, windowPlacer } = createCoordinator();
+    const { coordinator } = createCoordinator();
 
     coordinator.tileWindows();
 
-    expect(windowPlacer.applyLayoutMap).toHaveBeenCalledOnce();
-    expect(windowPlacer.windowsAtLayoutApplication).toEqual([]);
+    expect(mocks.applyLayoutMap).toHaveBeenCalledWith([], mocks.layoutMap);
   });
 });

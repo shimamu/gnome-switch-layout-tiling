@@ -12,8 +12,7 @@ import { DesktopContext } from '../env/desktopContext.js';
 import { countEnabledLayouts } from '../logic/layoutOperations.js';
 import { pipe } from '../logic/functional.js';
 import { LayoutConverter } from '../logic/layoutPatterns.js';
-import { logger } from './logger.js';
-import { getActiveWindowsNewestFirst } from './windowOrder.js';
+import { WindowOrder } from './windowOrder.js';
 
 
 const RESIZE_RETRY_LIMIT = 10;
@@ -21,8 +20,9 @@ const RESIZE_RETRY_DELAY_MS = 200;
 
 
 export class WindowPlacer {
-  constructor(layoutPreferences) {
+  constructor(layoutPreferences, logger) {
     this._layoutPreferences = layoutPreferences;
+    this._logger = logger;
     this._converter = new LayoutConverter();
     this._timeoutId = null;
   }
@@ -32,7 +32,7 @@ export class WindowPlacer {
   }
 
   applyLayoutMap(activeWindows, layoutMap) {
-    logger.info('Apply layout map');
+    this._logger.info('Apply layout map');
 
     const activeWindowCount = activeWindows.length;
     if (activeWindowCount === 0)
@@ -46,7 +46,8 @@ export class WindowPlacer {
   }
 
   getSplitAreaCount(layoutMap) {
-    const activeWindows = getActiveWindowsNewestFirst();
+    const windowOrder = new WindowOrder(this._logger);
+    const activeWindows = windowOrder.getActiveWindowsNewestFirst();
     const activeWindowCount = activeWindows.length;
 
     return this._determineSplitAreaCount(layoutMap, activeWindowCount);
@@ -142,7 +143,7 @@ export class WindowPlacer {
   }
 
   _logLayout(targetWindow, index, rectRatio, rectPixel) {
-    logger.debug(
+    this._logger.debug(
       `  Windows[${index}] `
       + `id=${targetWindow.get_id()} `
       + `userTime=${targetWindow.get_user_time()} `

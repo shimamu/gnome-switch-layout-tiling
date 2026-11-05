@@ -9,7 +9,6 @@
  */
 import { gettext as _ } from 'resource:///org/gnome/shell/extensions/extension.js';
 import St from 'gi://St';
-import { logger } from '../../io/logger.js';
 import { pipe } from '../../logic/functional.js';
 import { patternOf, splitRatioOf } from '../../logic/layoutOperations.js';
 import { patternsForSplitAreaCount, LayoutConverter } from '../../logic/layoutPatterns.js';
@@ -21,9 +20,11 @@ export class LayoutConfigurator {
     splitAreaCount,
     layout,
     handlers = {},
+    logger,
   }) {
     this._splitAreaCount = splitAreaCount;
     this._handlers = handlers;
+    this._logger = logger;
 
     this._container = new St.BoxLayout({
       vertical: true,
@@ -40,7 +41,7 @@ export class LayoutConfigurator {
   }
 
   destroy() {
-    logger.debug(`${this.constructor.name} destroyed`);
+    this._logger.debug(`${this.constructor.name} destroyed`);
     // Child actors are destroyed with the parent actor.
 
     this._container = null;

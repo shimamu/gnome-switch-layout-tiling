@@ -12,7 +12,6 @@ import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
-import { logger } from '../../io/logger.js';
 import * as fn from '../../logic/functional.js';
 import {
   MAX_SPLIT_AREA_COUNT,
@@ -25,8 +24,12 @@ import { LayoutPatternSelector } from './layoutConfiguratorComponents.js';
 
 
 class ActionButtonsPane {
-  constructor(handlers = {}) {
+  constructor({
+    handlers = {},
+    logger,
+  }) {
     this._handlers = handlers;
+    this._logger = logger;
 
     this._container = new St.BoxLayout({
       style_class: 'layout-map-editor-action-buttons-pane',
@@ -43,7 +46,7 @@ class ActionButtonsPane {
   }
 
   destroy() {
-    logger.debug(`${this.constructor.name} destroyed`);
+    this._logger.debug(`${this.constructor.name} destroyed`);
     // Child actors are destroyed with the parent actor.
 
     this._container = null;
@@ -77,8 +80,9 @@ class ActionButtonsPane {
 
 
 class LayoutMapUpdateController {
-  constructor(layoutMap) {
+  constructor(layoutMap, logger) {
     this._layoutMap = layoutMap;
+    this._logger = logger;
     this._listeners = {};
   }
 
@@ -94,7 +98,7 @@ class LayoutMapUpdateController {
   }
 
   updateLayout(splitAreaCount, newLayout) {
-    logger.debug(
+    this._logger.debug(
       `Updating layout (split area count: ${splitAreaCount})`,
     );
 
@@ -131,7 +135,7 @@ class LayoutMapUpdateController {
   _emit(eventName, data) {
     const listeners = this._listeners[eventName] || [];
 
-    logger.debug(
+    this._logger.debug(
       `Emitting event "${eventName}" to ${listeners.length} listener(s)`,
     );
 
@@ -149,11 +153,13 @@ export class LayoutMapEditor {
     layoutMap,
     layoutMapIndex,
     handlers = {},
+    logger,
   }) {
-    this._layoutMapUpdateController = new LayoutMapUpdateController(layoutMap);
+    this._layoutMapUpdateController = new LayoutMapUpdateController(layoutMap, logger);
     this._layoutMapIndex = layoutMapIndex;
     this._handlers = handlers;
     this._closing = false;
+    this._logger = logger;
 
     this._dialog = new ModalDialog.ModalDialog({
       styleClass: 'layout-map-editor-dialog',
@@ -179,7 +185,7 @@ export class LayoutMapEditor {
   }
 
   destroy() {
-    logger.debug(`${this.constructor.name} destroyed`);
+    this._logger.debug(`${this.constructor.name} destroyed`);
 
     this._actionButtonsPane.destroy();
     this._layoutConfigurators.forEach(configurator => {
@@ -264,6 +270,7 @@ export class LayoutMapEditor {
               layout,
             ),
         },
+        logger: this._logger,
       });
 
       this._layoutConfigurators.set(
@@ -298,7 +305,7 @@ export class LayoutMapEditor {
               );
 
             if (mode !== null) {
-              logger.debug(
+              this._logger.debug(
                 `Updating selectable mode (split area count: ${splitAreaCount}, mode: ${mode})`,
               );
 
@@ -318,25 +325,28 @@ export class LayoutMapEditor {
 
   _createActionButtonsPane(onSave) {
     this._actionButtonsPane = new ActionButtonsPane({
-      onSave: () => {
-        if (this._closing)
-          return;
+      handlers: {
+        onSave: () => {
+          if (this._closing)
+            return;
 
-        const layoutMap = this._layoutMapUpdateController.layoutMap;
+          const layoutMap = this._layoutMapUpdateController.layoutMap;
 
-        logger.info(
-          `Saving layout map (index: ${this._layoutMapIndex})`,
-        );
+          this._logger.info(
+            `Saving layout map (index: ${this._layoutMapIndex})`,
+          );
 
-        // Close the UI before saving.
-        // The save callback may destroy the editor, so avoid calling _close() again afterward.
-        this._close();
-        onSave(layoutMap);
+          // Close the UI before saving.
+          // The save callback may destroy the editor, so avoid calling _close() again afterward.
+          this._close();
+          onSave(layoutMap);
+        },
+
+        onCancel: () => {
+          this._close();
+        },
       },
-
-      onCancel: () => {
-        this._close();
-      },
+      logger: this._logger,
     });
   }
 

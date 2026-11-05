@@ -12,7 +12,6 @@ import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
-import { logger } from '../io/logger.js';
 import * as fn from '../logic/functional.js';
 import { MAX_SPLIT_AREA_COUNT, layoutOf } from '../logic/layoutOperations.js';
 import { LayoutPreview } from './components/layoutPreview.js';
@@ -31,10 +30,12 @@ class LayoutMapListRow {
     layoutMapIndex,
     layoutMap,
     handlers = {},
+    logger,
   }) {
     this._layoutMapIndex = layoutMapIndex;
     this._layoutMap = layoutMap;
     this._handlers = handlers;
+    this._logger = logger;
 
     this._container = new PopupMenu.PopupBaseMenuItem({ reactive: false });
     this._checkIcon = this._createCheckIcon();
@@ -50,7 +51,7 @@ class LayoutMapListRow {
   }
 
   destroy() {
-    logger.debug(`${this.constructor.name} destroyed`);
+    this._logger.debug(`${this.constructor.name} destroyed`);
 
     this._layoutMenuItem?.disconnect(this._layoutMenuItemSignalId);
     this._layoutMenuItem?.destroy();
@@ -247,9 +248,10 @@ class LayoutMapListRow {
 
 
 class LayoutMapListView {
-  constructor({ layoutMaps, handlers }) {
+  constructor({ layoutMaps, handlers, logger }) {
     this._layoutMaps = layoutMaps;
     this._handlers = handlers;
+    this._logger = logger;
 
     this._container = new St.ScrollView({
       style_class: 'indicator-menu-layout-map-list-view',
@@ -274,7 +276,7 @@ class LayoutMapListView {
   }
 
   destroy() {
-    logger.debug(`${this.constructor.name} destroyed`);
+    this._logger.debug(`${this.constructor.name} destroyed`);
 
     this._layoutMapListRows.forEach((layoutMapListRow) => {
       layoutMapListRow?.destroy();
@@ -307,6 +309,7 @@ class LayoutMapListView {
           onDelete: this._handlers.onLayoutMapDelete,
           onDeleteCancel: this._handlers.onLayoutMapDeleteCancel,
         },
+        logger: this._logger,
       });
       this._layoutMapListRows.push(layoutMapListRow);
     });
@@ -324,9 +327,10 @@ class LayoutMapListView {
 class FixedAreaSection {
   static AREA_LABEL_START_INDEX = 1;
 
-  constructor({ dataSource, handlers = {} }) {
+  constructor({ dataSource, handlers = {}, logger }) {
     this._dataSource = dataSource;
     this._handlers = handlers;
+    this._logger = logger;
 
     this._container = new PopupMenu.PopupMenuSection();
     this._menuItems = [];
@@ -354,7 +358,7 @@ class FixedAreaSection {
   }
 
   destroy() {
-    logger.debug(`${this.constructor.name} destroyed`);
+    this._logger.debug(`${this.constructor.name} destroyed`);
 
     this._menuItems.forEach((menuItem, index) => {
       menuItem.disconnect(this._menuItemSignalIds[index]);
@@ -449,12 +453,14 @@ class LayoutMapSection {
       getLayoutMaps,
     },
     handlers = {},
+    logger,
   }) {
     this._dataSource = {
       getLayoutMapIndex,
       getLayoutMaps,
     };
     this._handlers = handlers;
+    this._logger = logger;
 
     this._container = new PopupMenu.PopupMenuSection();
 
@@ -479,7 +485,7 @@ class LayoutMapSection {
   }
 
   destroy() {
-    logger.debug(`${this.constructor.name} destroyed`);
+    this._logger.debug(`${this.constructor.name} destroyed`);
 
     this._layoutMapListView?.destroy();
     this._layoutMapListView = null;
@@ -500,6 +506,7 @@ class LayoutMapSection {
     this._layoutMapListView = new LayoutMapListView({
       layoutMaps: this._dataSource.getLayoutMaps(),
       handlers: this._handlers,
+      logger: this._logger,
     });
   }
 
@@ -538,9 +545,10 @@ class LayoutMapSection {
 export class IndicatorMenu {
   static ICON_AT_START_INDEX = 0;
 
-  constructor({ dataSource = {}, handlers = {} }) {
+  constructor({ dataSource = {}, handlers = {}, logger }) {
     this._dataSource = dataSource;
     this._handlers = handlers;
+    this._logger = logger;
 
     this._container = new PopupMenu.PopupMenuSection();
 
@@ -561,7 +569,7 @@ export class IndicatorMenu {
   }
 
   destroy() {
-    logger.debug(`${this.constructor.name} destroyed`);
+    this._logger.debug(`${this.constructor.name} destroyed`);
 
     this._menuItemRetileWindows?.disconnect(this._menuItemRetileWindowsSignalId);
     this._menuItemRetileWindows?.destroy();
@@ -599,6 +607,7 @@ export class IndicatorMenu {
         onClearFixedAreas: this._handlers.onClearFixedAreas,
         onToggleFixedArea: this._handlers.onToggleFixedArea,
       },
+      logger: this._logger,
     });
     this._layoutMapSection = new LayoutMapSection({
       dataSource: this._dataSource,
@@ -622,6 +631,7 @@ export class IndicatorMenu {
         },
         onLayoutMapDeleteCancel: this._handlers.onLayoutMapDeleteCancel,
       },
+      logger: this._logger,
     });
     this._menuItemAddLayout = this._createMenuItemAddLayout(this._handlers.onAddNewLayoutMap);
     this._menuItemSettings = this._createMenuItemSettings(this._handlers.onOpenSettingsWindow);

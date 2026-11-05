@@ -67,5 +67,3 @@ export class Logger {
     return level >= this._level;
   }
 }
-
-export const logger = new Logger();

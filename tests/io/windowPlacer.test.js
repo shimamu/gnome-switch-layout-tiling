@@ -1,3 +1,4 @@
+
 /*
  * Switch Layout Tiling
  *
@@ -12,7 +13,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const {
   timeoutAdd,
   getWorkArea,
-  getTileMargin,
   countEnabledLayouts,
   toRectRatios,
   toRectPixel,
@@ -22,7 +22,6 @@ const {
 } = vi.hoisted(() => ({
   timeoutAdd: vi.fn(),
   getWorkArea: vi.fn(),
-  getTileMargin: vi.fn(),
   countEnabledLayouts: vi.fn(),
   toRectRatios: vi.fn(),
   toRectPixel: vi.fn(),
@@ -78,15 +77,12 @@ vi.mock('../../extension/logic/layoutPatterns.js', () => ({
   },
 }));
 
-vi.mock('../../extension/io/logger.js', () => ({
-  logger: {
-    info: loggerInfo,
-    debug: loggerDebug,
-  },
-}));
-
 vi.mock('../../extension/io/windowOrder.js', () => ({
-  getActiveWindowsNewestFirst,
+  WindowOrder: class {
+    getActiveWindowsNewestFirst(...args) {
+      return getActiveWindowsNewestFirst(...args);
+    }
+  },
 }));
 
 import { WindowPlacer } from '../../extension/io/windowPlacer.js';
@@ -117,18 +113,13 @@ const createWindow = ({
   id = 1,
   userTime = 100,
   allowsResize = true,
-  maximized = false,
   maximizedHorizontally = false,
   maximizedVertically = false,
-  legacyMaximized = false,
 } = {}) => ({
   get_id: vi.fn(() => id),
   get_user_time: vi.fn(() => userTime),
   allows_resize: vi.fn(() => allowsResize),
   move_resize_frame: vi.fn(),
-  get_maximized: legacyMaximized
-    ? vi.fn(() => maximized ? 3 : 0)
-    : undefined,
   maximized_horizontally: maximizedHorizontally,
   maximized_vertically: maximizedVertically,
   unmaximize: vi.fn(),
@@ -138,8 +129,16 @@ const createLayoutPreferences = (tileMargin = 10) => ({
   getTileMargin: vi.fn(() => tileMargin),
 });
 
+const createLogger = () => ({
+  info: loggerInfo,
+  debug: loggerDebug,
+});
+
 const createPlacer = (tileMargin = 10) =>
-  new WindowPlacer(createLayoutPreferences(tileMargin));
+  new WindowPlacer(
+    createLayoutPreferences(tileMargin),
+    createLogger(),
+  );
 
 const LEFT_HALF = {
   x: 0,
@@ -160,7 +159,6 @@ describe('WindowPlacer', () => {
     vi.clearAllMocks();
 
     getWorkArea.mockReturnValue(WORK_AREA);
-    getTileMargin.mockReturnValue(10);
 
     countEnabledLayouts.mockImplementation(
       (layoutMap) => Object.keys(layoutMap ?? {}).length,
@@ -369,30 +367,7 @@ describe('WindowPlacer', () => {
   });
 
   describe('_unmaximizeWindow', () => {
-    it('unmaximizes a window using the legacy API when it is maximized', () => {
-      const targetWindow = createWindow({
-        legacyMaximized: true,
-        maximized: true,
-      });
-
-      createPlacer()._unmaximizeWindow(targetWindow);
-
-      expect(targetWindow.get_maximized).toHaveBeenCalledOnce();
-      expect(targetWindow.unmaximize).toHaveBeenCalledWith(3);
-    });
-
-    it('does not unmaximize a window using the legacy API when it is not maximized', () => {
-      const targetWindow = createWindow({
-        legacyMaximized: true,
-        maximized: false,
-      });
-
-      createPlacer()._unmaximizeWindow(targetWindow);
-
-      expect(targetWindow.unmaximize).not.toHaveBeenCalled();
-    });
-
-    it('unmaximizes a window using the modern API when horizontally maximized', () => {
+    it('unmaximizes a horizontally maximized window', () => {
       const targetWindow = createWindow({
         maximizedHorizontally: true,
       });
@@ -403,7 +378,7 @@ describe('WindowPlacer', () => {
       expect(targetWindow.unmaximize).toHaveBeenCalledWith();
     });
 
-    it('unmaximizes a window using the modern API when vertically maximized', () => {
+    it('unmaximizes a vertically maximized window', () => {
       const targetWindow = createWindow({
         maximizedVertically: true,
       });
@@ -411,6 +386,7 @@ describe('WindowPlacer', () => {
       createPlacer()._unmaximizeWindow(targetWindow);
 
       expect(targetWindow.unmaximize).toHaveBeenCalledOnce();
+      expect(targetWindow.unmaximize).toHaveBeenCalledWith();
     });
 
     it('does not unmaximize a window that is not maximized', () => {
@@ -479,8 +455,7 @@ describe('WindowPlacer', () => {
   describe('_resizeWindow', () => {
     it('unmaximizes and resizes a window when resizing is allowed', () => {
       const targetWindow = createWindow({
-        legacyMaximized: true,
-        maximized: true,
+        maximizedHorizontally: true,
       });
       const rectPixelWithMargin = {
         x: 10,
@@ -491,7 +466,7 @@ describe('WindowPlacer', () => {
 
       createPlacer()._resizeWindow(targetWindow, rectPixelWithMargin);
 
-      expect(targetWindow.unmaximize).toHaveBeenCalledWith(3);
+      expect(targetWindow.unmaximize).toHaveBeenCalledOnce();
       expect(targetWindow.move_resize_frame).toHaveBeenCalledWith(
         true,
         10,
@@ -635,11 +610,10 @@ describe('WindowPlacer', () => {
     it('does not apply a layout when there are no active windows', () => {
       const layoutMap = createLayoutMap();
 
-      createPlacer().applyLayoutMap(layoutMap);
+      createPlacer().applyLayoutMap([], layoutMap);
 
       expect(loggerInfo).toHaveBeenCalledWith('Apply layout map');
       expect(toRectRatios).not.toHaveBeenCalled();
-      expect(getActiveWindowsNewestFirst).toHaveBeenCalledOnce();
     });
 
     it('does not apply a layout when no layout is available', () => {
@@ -648,10 +622,9 @@ describe('WindowPlacer', () => {
         createWindow({ id: 2 }),
       ];
 
-      getActiveWindowsNewestFirst.mockReturnValue(windows);
       countEnabledLayouts.mockReturnValue(0);
 
-      createPlacer().applyLayoutMap({});
+      createPlacer().applyLayoutMap(windows, {});
 
       expect(toRectRatios).not.toHaveBeenCalled();
       windows.forEach((targetWindow) => {
@@ -666,10 +639,9 @@ describe('WindowPlacer', () => {
         createWindow({ id: 2 }),
       ];
 
-      getActiveWindowsNewestFirst.mockReturnValue(windows);
       toRectRatios.mockReturnValue([LEFT_HALF, RIGHT_HALF]);
 
-      createPlacer(0).applyLayoutMap(layoutMap);
+      createPlacer(0).applyLayoutMap(windows, layoutMap);
 
       expect(toRectRatios).toHaveBeenCalledWith(layoutMap[2]);
       expect(windows[0].move_resize_frame).toHaveBeenCalledWith(
@@ -697,10 +669,9 @@ describe('WindowPlacer', () => {
         createWindow({ id: 4 }),
       ];
 
-      getActiveWindowsNewestFirst.mockReturnValue(windows);
       toRectRatios.mockReturnValue([LEFT_HALF, RIGHT_HALF]);
 
-      createPlacer(0).applyLayoutMap(layoutMap);
+      createPlacer(0).applyLayoutMap(windows, layoutMap);
 
       expect(toRectRatios).toHaveBeenCalledWith(layoutMap[3]);
       expect(windows).toHaveLength(4);
@@ -742,10 +713,9 @@ describe('WindowPlacer', () => {
         createWindow({ id: 2 }),
       ];
 
-      getActiveWindowsNewestFirst.mockReturnValue(windows);
       toRectRatios.mockReturnValue([LEFT_HALF, RIGHT_HALF]);
 
-      createPlacer(10).applyLayoutMap(layoutMap);
+      createPlacer(10).applyLayoutMap(windows, layoutMap);
 
       expect(windows[0].move_resize_frame).toHaveBeenCalledWith(
         true,

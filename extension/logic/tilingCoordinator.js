@@ -9,8 +9,7 @@
  */
 import GLib from 'gi://GLib';
 import { DesktopContext } from '../env/desktopContext.js';
-import { logger } from '../io/logger.js';
-import { WindowOrder, getActiveWindowsNewestFirst, logWindowOrder, reorderActiveWindows, rotateWindowOrder } from '../io/windowOrder.js';
+import { WindowOrder } from '../io/windowOrder.js';
 import { pipe } from '../logic/functional.js';
 
 
@@ -21,11 +20,14 @@ export class TilingCoordinator {
   constructor({
     dataSource = {},
     windowPlacer,
+    logger,
   }) {
     this._dataSource = dataSource;
     this._windowPlacer = windowPlacer;
     this._visibleWindows = [];
+    this._logger = logger;
 
+    this._windowOrder = new WindowOrder(this._logger);
     this._lastTileScrollTimestamp = 0;
     this._timeoutId = null;
   }
@@ -35,7 +37,7 @@ export class TilingCoordinator {
   }
 
   tileWindows() {
-    logger.info('Tile windows');
+    this._logger.info('Tile windows');
 
     const windowsInDisplayOrder = this._withUpdatedVisibleWindows(
       () => this._getWindowsInDisplayOrder(),
@@ -55,11 +57,11 @@ export class TilingCoordinator {
   }
 
   rotateWindowsClockwise(fixedAreaIndexes) {
-    this._rotateAndRetile(WindowOrder.CLOCKWISE, fixedAreaIndexes);
+    this._rotateAndRetile(this._windowOrder.CLOCKWISE, fixedAreaIndexes);
   }
 
   rotateWindowsCounterClockwise(fixedAreaIndexes) {
-    this._rotateAndRetile(WindowOrder.COUNTER_CLOCKWISE, fixedAreaIndexes);
+    this._rotateAndRetile(this._windowOrder.COUNTER_CLOCKWISE, fixedAreaIndexes);
   }
 
   _rotateAndRetile(direction, fixedAreaIndexes) {
@@ -71,7 +73,7 @@ export class TilingCoordinator {
     );
 
     const rotatedWindows = this._withUpdatedVisibleWindows(
-      () => rotateWindowOrder(windowsInDisplayOrder, direction, fixedAreaIndexes),
+      () => this._windowOrder.rotateWindowOrder(windowsInDisplayOrder, direction, fixedAreaIndexes),
     );
 
     this._activateWindowsNewestFirst(rotatedWindows);
@@ -80,17 +82,17 @@ export class TilingCoordinator {
   }
 
   _getWindowsInDisplayOrder() {
-    logger.info('Get windows in display order');
-    logWindowOrder('Before reorder (Visible windows)', this._visibleWindows);
+    this._logger.info('Get windows in display order');
+    this._windowOrder.logWindowOrder('Before reorder (Visible windows)', this._visibleWindows);
 
-    const activeWindows = getActiveWindowsNewestFirst();
-    logWindowOrder('Before reorder (Active windows)', activeWindows);
+    const activeWindows = this._windowOrder.getActiveWindowsNewestFirst();
+    this._windowOrder.logWindowOrder('Before reorder (Active windows)', activeWindows);
 
-    const reorderedWindows = reorderActiveWindows(
+    const reorderedWindows = this._windowOrder.reorderActiveWindows(
       activeWindows,
       this._visibleWindows,
     );
-    logWindowOrder('After reorder (Reordered windows)', reorderedWindows);
+    this._windowOrder.logWindowOrder('After reorder (Reordered windows)', reorderedWindows);
 
     return reorderedWindows;
   }

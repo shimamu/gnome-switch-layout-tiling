@@ -15,7 +15,6 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 import { DesktopContext } from '../env/desktopContext.js';
-import { logger } from '../io/logger.js';
 import { IconFactory } from './components/icons.js';
 import { IndicatorMenu } from './indicatorMenu.js';
 
@@ -46,6 +45,7 @@ export const Indicator = GObject.registerClass(
       indicatorName,
       dataSource = {},
       handlers = {},
+      logger,
     }) {
       super._init(INDICATOR_MENU_PARAMS.SOURCE_ALIGNMENT, indicatorName);
 
@@ -54,6 +54,7 @@ export const Indicator = GObject.registerClass(
       this._extensionId = extensionId;
       this._dataSource = dataSource;
       this._handlers = handlers;
+      this._logger = logger;
 
       this._openPanelMenuSourceId = null;
       this._updateWindowCountSourceId = null;
@@ -106,7 +107,7 @@ export const Indicator = GObject.registerClass(
     }
 
     destroy() {
-      logger.debug(`${this.constructor.name} destroyed`);
+      this._logger.debug(`${this.constructor.name} destroyed`);
 
       this._clearOpenPanelMenuSource();
       this._clearUpdateWindowCountSource();
@@ -207,6 +208,7 @@ export const Indicator = GObject.registerClass(
             GLib.spawn_command_line_async(`gnome-extensions prefs ${this._extensionUuid}`);
           },
         },
+        logger: this._logger,
       });
     }
 

@@ -10,7 +10,6 @@
 import * as fn from './functional.js';
 import { addLayoutMap, layoutMapOf, removeLayoutMap, swapLayoutMapOrder,
   updateLayoutMaps } from './layoutOperations.js';
-import { logger } from '../io/logger.js';
 import { loadLayoutMapsRaw, saveLayoutMapsRaw } from '../io/settings.js';
 import { PATTERN, SPLIT } from './layoutPatterns.js';
 
@@ -61,8 +60,9 @@ export function createNewLayoutMap() {
 export class LayoutMapsManager {
   static MAX_LAYOUT_COUNT = 50;
 
-  constructor(settings) {
+  constructor(settings, logger) {
     this._settings = settings;
+    this._logger = logger;
     this._layoutMaps = null;
   }
 
@@ -71,13 +71,13 @@ export class LayoutMapsManager {
       const layoutMaps = loadLayoutMapsRaw(this._settings);
 
       if (Array.isArray(layoutMaps) && layoutMaps.length > 0) {
-        logger.info('layoutMaps loaded');
+        this._logger.info('layoutMaps loaded');
         this._layoutMaps = layoutMaps;
         return layoutMaps;
       }
-      logger.info('layoutMaps is empty, using default layoutMaps');
+      this._logger.info('layoutMaps is empty, using default layoutMaps');
     } catch (error) {
-      logger.error(`Failed to load layoutMaps from settings: ${error}`);
+      this._logger.error(`Failed to load layoutMaps from settings: ${error}`);
     }
 
     this._layoutMaps = getInitialLayoutMaps();
@@ -89,7 +89,7 @@ export class LayoutMapsManager {
     try {
       saveLayoutMapsRaw(this._settings, this._layoutMaps);
     } catch (error) {
-      logger.error(`Failed to save layoutMaps: ${error}`);
+      this._logger.error(`Failed to save layoutMaps: ${error}`);
     }
   }
 

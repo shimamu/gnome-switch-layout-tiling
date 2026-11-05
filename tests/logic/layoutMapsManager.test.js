@@ -12,25 +12,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const {
   loadLayoutMapsRaw,
   saveLayoutMapsRaw,
-  loggerInfo,
-  loggerError,
 } = vi.hoisted(() => ({
   loadLayoutMapsRaw: vi.fn(),
   saveLayoutMapsRaw: vi.fn(),
-  loggerInfo: vi.fn(),
-  loggerError: vi.fn(),
 }));
 
 vi.mock('../../extension/io/settings.js', () => ({
   loadLayoutMapsRaw,
   saveLayoutMapsRaw,
-}));
-
-vi.mock('../../extension/io/logger.js', () => ({
-  logger: {
-    info: loggerInfo,
-    error: loggerError,
-  },
 }));
 
 import {
@@ -43,6 +32,11 @@ import { PATTERN, SPLIT } from '../../extension/logic/layoutPatterns.js';
 
 const createLayoutMap = (pattern = PATTERN.FULL) => ({
   1: { pattern },
+});
+
+const createLogger = () => ({
+  info: vi.fn(),
+  error: vi.fn(),
 });
 
 describe('getInitialLayoutMaps', () => {
@@ -77,11 +71,13 @@ describe('createNewLayoutMap', () => {
 describe('LayoutMapsManager', () => {
   let manager;
   let settings;
+  let logger;
 
   beforeEach(() => {
     vi.clearAllMocks();
     settings = {};
-    manager = new LayoutMapsManager(settings);
+    logger = createLogger();
+    manager = new LayoutMapsManager(settings, logger);
   });
 
   describe('load', () => {
@@ -95,7 +91,7 @@ describe('LayoutMapsManager', () => {
       expect(result).toBe(layoutMaps);
       expect(manager.getLayoutMaps()).toBe(layoutMaps);
       expect(loadLayoutMapsRaw).toHaveBeenCalledWith(settings);
-      expect(loggerInfo).toHaveBeenCalledWith('layoutMaps loaded');
+      expect(logger.info).toHaveBeenCalledWith('layoutMaps loaded');
     });
 
     it('uses initial layout maps when settings are empty', () => {
@@ -105,7 +101,7 @@ describe('LayoutMapsManager', () => {
 
       expect(result).toBe(getInitialLayoutMaps());
       expect(manager.getLayoutMaps()).toBe(result);
-      expect(loggerInfo).toHaveBeenCalledWith(
+      expect(logger.info).toHaveBeenCalledWith(
         'layoutMaps is empty, using default layoutMaps',
       );
     });
@@ -128,7 +124,7 @@ describe('LayoutMapsManager', () => {
 
       expect(result).toBe(getInitialLayoutMaps());
       expect(manager.getLayoutMaps()).toBe(result);
-      expect(loggerError).toHaveBeenCalledWith(
+      expect(logger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to load layoutMaps from settings:'),
       );
     });
@@ -155,7 +151,7 @@ describe('LayoutMapsManager', () => {
       });
 
       expect(() => manager.save()).not.toThrow();
-      expect(loggerError).toHaveBeenCalledWith(
+      expect(logger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to save layoutMaps:'),
       );
     });
