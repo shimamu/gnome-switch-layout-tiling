@@ -27,6 +27,11 @@ export class TilingCoordinator {
     this._visibleWindows = [];
 
     this._lastTileScrollTimestamp = 0;
+    this._timeoutId = null;
+  }
+
+  destroy() {
+    this._clearTimeout();
   }
 
   tileWindows() {
@@ -42,7 +47,8 @@ export class TilingCoordinator {
   }
 
   tileWindowsLater(interval_ms) {
-    GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval_ms, () => {
+    this._timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval_ms, () => {
+      this._timeoutId = null;
       this.tileWindows();
       return GLib.SOURCE_REMOVE;
     });
@@ -127,5 +133,13 @@ export class TilingCoordinator {
     );
 
     return windows;
+  }
+
+  _clearTimeout() {
+    if (this._timeoutId === null)
+      return;
+
+    GLib.Source.remove(this._timeoutId);
+    this._timeoutId = null;
   }
 }

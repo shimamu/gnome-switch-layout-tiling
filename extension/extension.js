@@ -51,6 +51,12 @@ export default class SwitchLayoutTilingExtension extends Extension {
     this._indicator.destroy();
     this._indicator = null;
 
+    this._tilingCoordinator.destroy();
+    this._tilingCoordinator = null;
+
+    this._windowPlacer.destroy();
+    this._windowPlacer = null;
+
     this._disconnectSignals();
   }
 

@@ -24,6 +24,11 @@ export class WindowPlacer {
   constructor(layoutPreferences) {
     this._layoutPreferences = layoutPreferences;
     this._converter = new LayoutConverter();
+    this._timeoutId = null;
+  }
+
+  destroy() {
+    this._clearTimeout();
   }
 
   applyLayoutMap(activeWindows, layoutMap) {
@@ -113,7 +118,11 @@ export class WindowPlacer {
     }
     if (retries <= 0)
       return;
-    GLib.timeout_add(GLib.PRIORITY_DEFAULT, RESIZE_RETRY_DELAY_MS, () => {
+
+    this._clearTimeout();
+
+    this._timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, RESIZE_RETRY_DELAY_MS, () => {
+      this._timeoutId = null;
       this._waitForResizable(targetWindow, callback, retries - 1);
       return GLib.SOURCE_REMOVE;
     });
@@ -122,6 +131,14 @@ export class WindowPlacer {
   _unmaximizeWindow(targetWindow) {
     if (targetWindow.maximized_horizontally || targetWindow.maximized_vertically)
       targetWindow.unmaximize();
+  }
+
+  _clearTimeout() {
+    if (this._timeoutId === null)
+      return;
+
+    GLib.Source.remove(this._timeoutId);
+    this._timeoutId = null;
   }
 
   _logLayout(targetWindow, index, rectRatio, rectPixel) {

@@ -55,6 +55,9 @@ export const Indicator = GObject.registerClass(
       this._dataSource = dataSource;
       this._handlers = handlers;
 
+      this._openPanelMenuSourceId = null;
+      this._updateWindowCountSourceId = null;
+
       this._createComponents();
       this._buildUI();
       this._connectSignals();
@@ -64,7 +67,8 @@ export const Indicator = GObject.registerClass(
     }
 
     openPanelMenuLater() {
-      GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+      this._openPanelMenuSourceId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+        this._openPanelMenuSourceId = null;
         this.menu.open();
         return GLib.SOURCE_REMOVE;
       });
@@ -82,7 +86,8 @@ export const Indicator = GObject.registerClass(
     }
 
     updateWindowCountLater(interval_ms) {
-      GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval_ms, () => {
+      this._updateWindowCountSourceId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval_ms, () => {
+        this._updateWindowCountSourceId = null;
         this.updateWindowCount();
         return GLib.SOURCE_REMOVE;
       });
@@ -102,6 +107,9 @@ export const Indicator = GObject.registerClass(
 
     destroy() {
       logger.debug(`${this.constructor.name} destroyed`);
+
+      this._clearOpenPanelMenuSource();
+      this._clearUpdateWindowCountSource();
 
       if (this._accentColorChangedId !== undefined) {
         this._interfaceSettings.disconnect(
@@ -229,5 +237,21 @@ export const Indicator = GObject.registerClass(
         'changed::accent-color',
         () => this._updateWindowCountLabelColor(),
       );
+    }
+
+    _clearOpenPanelMenuSource() {
+      if (this._openPanelMenuSourceId === null)
+        return;
+
+      GLib.Source.remove(this._openPanelMenuSourceId);
+      this._openPanelMenuSourceId = null;
+    }
+
+    _clearUpdateWindowCountSource() {
+      if (this._updateWindowCountSourceId === null)
+        return;
+
+      GLib.Source.remove(this._updateWindowCountSourceId);
+      this._updateWindowCountSourceId = null;
     }
   });
