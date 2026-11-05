@@ -38,7 +38,7 @@ export class TilingCoordinator {
 
     this._activateWindowsNewestFirst(windowsInDisplayOrder);
 
-    this._tileWindows();
+    this._tileWindows(windowsInDisplayOrder);
   }
 
   tileWindowsLater(interval_ms) {
@@ -70,7 +70,7 @@ export class TilingCoordinator {
 
     this._activateWindowsNewestFirst(rotatedWindows);
 
-    this._tileWindowsWithTimestamp();
+    this._tileWindowsWithTimestamp(rotatedWindows);
   }
 
   _getWindowsInDisplayOrder() {
@@ -97,14 +97,14 @@ export class TilingCoordinator {
     });
   }
 
-  _tileWindows() {
+  _tileWindows(windows) {
     const layoutMap = this._dataSource.getActiveLayoutMap();
 
-    this._windowPlacer.applyLayoutMap(layoutMap);
+    this._windowPlacer.applyLayoutMap(windows, layoutMap);
   }
 
-  _tileWindowsWithTimestamp() {
-    this._tileWindows();
+  _tileWindowsWithTimestamp(windows) {
+    this._tileWindows(windows);
     this._lastTileScrollTimestamp = global.get_current_time();
   }
 

@@ -26,10 +26,9 @@ export class WindowPlacer {
     this._converter = new LayoutConverter();
   }
 
-  applyLayoutMap(layoutMap) {
+  applyLayoutMap(activeWindows, layoutMap) {
     logger.info('Apply layout map');
 
-    const activeWindows = getActiveWindowsNewestFirst();
     const activeWindowCount = activeWindows.length;
     if (activeWindowCount === 0)
       return;
