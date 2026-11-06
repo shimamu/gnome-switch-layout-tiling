@@ -49,6 +49,8 @@ export class TilingCoordinator {
   }
 
   tileWindowsLater(interval_ms) {
+    this._clearTimeout();
+
     this._timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval_ms, () => {
       this._timeoutId = null;
       this.tileWindows();

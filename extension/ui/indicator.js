@@ -68,6 +68,8 @@ export const Indicator = GObject.registerClass(
     }
 
     openPanelMenuLater() {
+      this._clearOpenPanelMenuSource();
+
       this._openPanelMenuSourceId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
         this._openPanelMenuSourceId = null;
         this.menu.open();
@@ -87,6 +89,8 @@ export const Indicator = GObject.registerClass(
     }
 
     updateWindowCountLater(interval_ms) {
+      this._clearUpdateWindowCountSource();
+
       this._updateWindowCountSourceId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, interval_ms, () => {
         this._updateWindowCountSourceId = null;
         this.updateWindowCount();
