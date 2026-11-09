@@ -26,6 +26,7 @@ const TILE_DELAY_MS = {
   AFTER_CREATE: 800,
   AFTER_UNMANAGED: 100,
   AFTER_MINIMIZED: 100,
+  AFTER_WORKSPACE_CHANGED: 100,
 };
 
 const LAYOUT_MAP_MOVE_DIRECTION = {
@@ -234,6 +235,11 @@ export default class SwitchLayoutTilingExtension extends Extension {
     targetWindow.connect('notify::minimized', () => {
       this._tilingCoordinator.tileWindowsLater(TILE_DELAY_MS.AFTER_MINIMIZED);
       this._indicator.updateWindowCountLater(TILE_DELAY_MS.AFTER_MINIMIZED);
+    });
+
+    targetWindow.connect('workspace-changed', () => {
+      this._tilingCoordinator.tileWindowsLater(TILE_DELAY_MS.AFTER_WORKSPACE_CHANGED);
+      this._indicator.updateWindowCountLater(TILE_DELAY_MS.AFTER_WORKSPACE_CHANGED);
     });
 
     this._tilingCoordinator.tileWindowsLater(TILE_DELAY_MS.AFTER_CREATE);
