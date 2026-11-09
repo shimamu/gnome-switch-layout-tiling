@@ -215,6 +215,7 @@ export default class SwitchLayoutTilingExtension extends Extension {
     this._updateIndicatorMenuOnWorkspaceSwitched();
     this._enableRetilingOnTileMarginChanged();
     this._enableRetilingOnWindowLifecycleEvent();
+    this._enableRetilingOnWorkspaceSwitched();
   }
 
   _getActiveLayoutMap() {
@@ -261,7 +262,10 @@ export default class SwitchLayoutTilingExtension extends Extension {
 
   _updateIndicatorMenuOnWorkspaceSwitched() {
     this._onWorkspaceSwitched = this._onWorkspaceSwitched.bind(this);
-    this._workspaceSwitchedId = global.workspace_manager.connect('active-workspace-changed', this._onWorkspaceSwitched);
+    this._workspaceSwitchedForIndicatorId = global.workspace_manager.connect(
+      'active-workspace-changed',
+      this._onWorkspaceSwitched,
+    );
   }
 
   _enableRetilingOnTileMarginChanged() {
@@ -275,12 +279,22 @@ export default class SwitchLayoutTilingExtension extends Extension {
     this._windowCreatedId = global.display.connect('window-created', this._onWindowCreated);
   }
 
+  _enableRetilingOnWorkspaceSwitched() {
+    this._workspaceSwitchedForRetilingId = global.workspace_manager.connect(
+      'active-workspace-changed',
+      () => this._tilingCoordinator.tileWindows(),
+    );
+  }
+
   _disconnectSignals() {
     if (this._logLevelChangedId)
       this._developerPreferences.disconnect(this._logLevelChangedId);
 
-    if (this._workspaceSwitchedId)
-      global.workspace_manager.disconnect(this._workspaceSwitchedId);
+    if (this._workspaceSwitchedForIndicatorId)
+      global.workspace_manager.disconnect(this._workspaceSwitchedForIndicatorId);
+
+    if (this._workspaceSwitchedForRetilingId)
+      global.workspace_manager.disconnect(this._workspaceSwitchedForRetilingId);
 
     if (this._tileMarginChangedId)
       this._layoutPreferences.disconnect(this._tileMarginChangedId);
