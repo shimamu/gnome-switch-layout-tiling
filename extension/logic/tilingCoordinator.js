@@ -24,7 +24,7 @@ export class TilingCoordinator {
   }) {
     this._dataSource = dataSource;
     this._windowPlacer = windowPlacer;
-    this._visibleWindows = [];
+    this._visibleWindowsByWorkspace = new Map();
     this._logger = logger;
 
     this._windowOrder = new WindowOrder(this._logger);
@@ -85,14 +85,18 @@ export class TilingCoordinator {
 
   _getWindowsInDisplayOrder() {
     this._logger.info('Get windows in display order');
-    this._windowOrder.logWindowOrder('Before reorder (Visible windows)', this._visibleWindows);
+
+    const workspaceIndex = DesktopContext.getActiveWorkspaceIndex();
+    const visibleWindows = this._visibleWindowsByWorkspace.get(workspaceIndex) ?? [];
+
+    this._windowOrder.logWindowOrder('Before reorder (Visible windows)', visibleWindows);
 
     const activeWindows = this._windowOrder.getActiveWindowsNewestFirst();
     this._windowOrder.logWindowOrder('Before reorder (Active windows)', activeWindows);
 
     const reorderedWindows = this._windowOrder.reorderActiveWindows(
       activeWindows,
-      this._visibleWindows,
+      visibleWindows,
     );
     this._windowOrder.logWindowOrder('After reorder (Reordered windows)', reorderedWindows);
 
@@ -130,11 +134,14 @@ export class TilingCoordinator {
   _withUpdatedVisibleWindows(getWindows) {
     const windows = getWindows();
 
-    this._visibleWindows = pipe(
+    const visibleWindows = pipe(
       this._dataSource.getActiveLayoutMap(),
       (layoutMap) => this._windowPlacer.getSplitAreaCount(layoutMap),
       (splitAreaCount) => windows.slice(0, splitAreaCount),
     );
+
+    const workspaceIndex = DesktopContext.getActiveWorkspaceIndex();
+    this._visibleWindowsByWorkspace.set(workspaceIndex, visibleWindows);
 
     return windows;
   }
